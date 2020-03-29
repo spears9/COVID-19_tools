@@ -12,14 +12,18 @@
 
 from pylab import *
 import csv
+import pdb
+#use pdb.pm() to do a postmortem in flight
 ion()
 
 filePathCounty  = '/Users/spears9/repos/COVID-19_USAfacts/'
 filePath        = '/Users/spears9/repos/COVID-19/csse_covid_19_data/csse_covid_19_time_series/'
 
 def getDataCounty(filePathCounty):
-    confirmedFile = 'covid_confirmed_usafacts_u.csv'
-    deathsFile = 'covid_deaths_usafacts_u.csv'
+    #confirmedFile = 'covid_confirmed_usafacts_u.csv'
+    #deathsFile = 'covid_deaths_usafacts_u.csv'
+    confirmedFile = 'covid_confirmed_usafacts.csv'
+    deathsFile = 'covid_deaths_usafacts.csv'
     data       = []
     countyFIPS = []
     county     = []
@@ -35,7 +39,10 @@ def getDataCounty(filePathCounty):
             #state.append(row[2])
             #stateFIPS.append(row[3])
     matData = matrix(data)
-    confirmed = array(matData[:,4:],dtype=int32)
+    if matData[1,-1] == '':
+        confirmed = array(matData[:,4:-1],dtype=int32)
+    else:
+        confirmed = array(matData[:,4:],dtype=int32)
     data = []
     with open(filePathCounty+deathsFile,'r') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
@@ -47,7 +54,11 @@ def getDataCounty(filePathCounty):
             state.append(row[2])
             stateFIPS.append(row[3])
     matData = matrix(data)
-    deaths = array(matData[:,4:],dtype=int32)
+    #protect against empty strings in final column
+    if matData[1,-1] == '':
+        deaths = array(matData[:,4:-1],dtype=int32)
+    else:
+        deaths = array(matData[:,4:],dtype=int32)
     #ncol  = len(heads)-4
     #confirmed = loadtxt(filePath+confirmedFile,delimiter=',',skiprows=1,usecols= tuple(arange(4,ncol+2,1)))
     #deaths    = loadtxt(filePath+deathsFile,delimiter=',',skiprows=1,usecols= tuple(arange(4,ncol+2,1)))
@@ -124,7 +135,12 @@ class CovidCounty(object):
     def getLogD(self,type,minCases=0,frac=False):
         series = self.getSeries(type,minCases)
         Dseries = series[1:]-series[0:-1]
-        Aseries = (series[1:]+series[0:-1])/2
+        Aseries = (series[1:]+series[0:-1])/2.
+        #protect against divide by zero when there are no cases for two or more days
+        fixlocs = where(isin(Aseries,0))
+        #Dseries[fixlocs]=log(1)
+        Aseries[fixlocs]=1
+        #return logDerivative of log(1) so frac value is 1 when no cases        
         LD      = Dseries/Aseries
         if frac:
             LD = exp(LD)
@@ -159,7 +175,12 @@ class Covid(object):
     def getLogD(self,type,minCases=0,frac=False):
         series = self.getSeries(type,minCases)
         Dseries = series[1:]-series[0:-1]
-        Aseries = (series[1:]+series[0:-1])/2
+        Aseries = (series[1:]+series[0:-1])/2.
+        #protect against divide by zero when there are no cases for two or more days
+        fixlocs = where(isin(Aseries,0))
+        Dseries[fixlocs]=log(1)
+        Aseries[fixlocs]=1
+        #return logDerivative of log(1) so frac value is 1 when no ases
         LD      = Dseries/Aseries
         if frac:
             LD = exp(LD)
