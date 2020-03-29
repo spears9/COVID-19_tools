@@ -1,65 +1,56 @@
-from covid_global_class import *
+#from covid_global_class import *
+from covid_joint_class import *
 
 
+
+
+
+plotPath = '/Users/spears9/Files/personal/covid_19/plots/current/'
 
 # total current (confirmed-deaths) cases vs days since 100 cases
+figNum = 1
 sinceCases    = 1000
-smoothingDays = 5
 thisSeries    = 'current'
-
-usCurrent    = np.convolve(Covid('US').getSeries(thisSeries,minCases=sinceCases), np.ones((smoothingDays,))/smoothingDays, mode='valid')
-chinaCurrent = np.convolve(Covid('China').getSeries(thisSeries,minCases=sinceCases), np.ones((smoothingDays,))/smoothingDays, mode='valid')
-italyCurrent = np.convolve(Covid('Italy').getSeries(thisSeries,minCases=sinceCases), np.ones((smoothingDays,))/smoothingDays, mode='valid')
-germanyCurrent    = np.convolve(Covid('Germany').getSeries(thisSeries,minCases=sinceCases), np.ones((smoothingDays,))/smoothingDays, mode='valid')
-
-figure(1)
+order         = 'series'
+plotFile = 'currentCases.png'
+places = ['US','China','Italy','Germany']
+styles = ['b-','r-','g-','y-']
+plotGlobal(figNum,places,thisSeries,order,styles=styles,sinceCases=sinceCases,smoothingDays=1)
 yscale('log')
-plot(usCurrent,'b-')
-plot(chinaCurrent,'r-')
-plot(italyCurrent,'g-')
-plot(germanyCurrent,'y-')
+savefig(plotPath+plotFile)
 
-# total current (confirmed-deaths) cases vs days since 100 cases
-# add recoveries when you can
-# needs fix to reading recoveries file; same encoding problem as county data?
+# total current (confirmed-deaths) rates vs days since 100 cases
+figNum = 2
 sinceCases    = 1000
-smoothingDays = 5
 thisSeries    = 'current'
+order         = 'rates'
+plotFile = 'currentRates.png'
+places = ['US','China','Italy','Germany']
+styles = ['b-','r-','g-','y-']
+plotGlobal(figNum,places,thisSeries,order,styles=styles,sinceCases=sinceCases)
+savefig(plotPath+plotFile)
 
-usCurrentRate    = np.convolve(Covid('US').getLogD(thisSeries,minCases=sinceCases,frac=True), np.ones((smoothingDays,))/smoothingDays, mode='valid')
-chinaCurrentRate = np.convolve(Covid('China').getLogD(thisSeries,minCases=sinceCases,frac=True), np.ones((smoothingDays,))/smoothingDays, mode='valid')
-italyCurrentRate = np.convolve(Covid('Italy').getLogD(thisSeries,minCases=sinceCases,frac=True), np.ones((smoothingDays,))/smoothingDays, mode='valid')
-germanyCurrentRate    = np.convolve(Covid('Germany').getLogD(thisSeries,minCases=sinceCases,frac=True), np.ones((smoothingDays,))/smoothingDays, mode='valid')
 
-figure(2)
-plot(usCurrentRate,'b-')
-plot(chinaCurrentRate,'r-')
-plot(italyCurrentRate,'g-')
-plot(germanyCurrentRate,'y-')
-plot(1.0+0.0*chinaCurrentRate,'k-.')
 
 
 # deaths vs days since 10 deaths
+figNum = 3
 sinceCases    = 10
-smoothingDays = 5
 thisSeries    = 'deaths'
-
-usDeaths    = np.convolve(Covid('US').getSeries(thisSeries,minCases=sinceCases), np.ones((smoothingDays,))/smoothingDays, mode='valid')
-chinaDeaths = np.convolve(Covid('China').getSeries(thisSeries,minCases=sinceCases), np.ones((smoothingDays,))/smoothingDays, mode='valid')
-italyDeaths = np.convolve(Covid('Italy').getSeries(thisSeries,minCases=sinceCases), np.ones((smoothingDays,))/smoothingDays, mode='valid')
-germanyDeaths    = np.convolve(Covid('Germany').getSeries(thisSeries,minCases=sinceCases), np.ones((smoothingDays,))/smoothingDays, mode='valid')
-figure(3)
+order         = 'series'
+plotFile = 'deathCases.png'
+places = ['US','China','Italy','Germany']
+styles = ['b-','r-','g-','y-']
+plotGlobal(figNum,places,thisSeries,order,styles=styles,sinceCases=sinceCases)
 yscale('log')
-plot(usDeaths,'b-')
-plot(chinaDeaths,'r-')
-plot(italyDeaths,'g-')
-plot(germanyDeaths,'y-')
+savefig(plotPath+plotFile)
+
 
 # deaths rate vs days since 10 deaths
 # add recoveries when you can
 # needs fix to reading recoveries file; same encoding problem as county data?
 #sinceCases    = 100
-#smoothingDays = 5
+smoothingDays = 5
 #thisSeries    = 'deaths'
 
 usDeathsRate      = np.convolve(Covid('US').getLogD(thisSeries,minCases=sinceCases,frac=True), np.ones((smoothingDays,))/smoothingDays, mode='valid')
@@ -73,6 +64,10 @@ plot(chinaDeathsRate,'r-')
 plot(italyDeathsRate,'g-')
 plot(germanyDeathsRate,'y-')
 plot(1.0+0.0*chinaDeathsRate,'k-.')
+plotFile = 'deathRates.png'
+savefig(plotPath+plotFile)
+
+
 
 # fatality rate: fatalities vs infections
 sinceCases    = 1000
@@ -100,6 +95,7 @@ italyDeaths = italyDeaths[-italyN:]
 germanyDeaths    = np.convolve(Covid('Germany').getSeries(thisSeries,minCases=sinceCases), np.ones((smoothingDays,))/smoothingDays, mode='valid')
 germanyDeaths    = germanyDeaths[-germanyN:]
 
+
 figure(5)
 yscale('log')
 xscale('log')
@@ -116,3 +112,16 @@ plot(x,ylo,'k-.')
 plot(x,y1,'k-.')
 plot(x,y5,'k-.')
 plot(x,y10,'k-.')
+plotFile = 'deathVsConfirmed.png'
+savefig(plotPath+plotFile)
+
+# deaths vs days since 10 deaths
+figNum = 6
+sinceCases    = 0
+thisSeries    = 'confirmed'
+order         = 'curve'
+plotFile = 'confirmedCurve.png'
+places = ['US','China','Italy','Germany']
+styles = ['b-','r-','g-','y-']
+plotGlobal(figNum,places,thisSeries,order,styles=styles,sinceCases=sinceCases,smoothingDays=10)
+savefig(plotPath+plotFile)
