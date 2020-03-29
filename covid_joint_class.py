@@ -199,32 +199,43 @@ def plotGlobal(figNum,places,thisSeries,order,sinceCases=100,smoothingDays=4,sty
     # places: list of placeName strings to be plotted on common plot; loop over places
     figure(figNum)
     if order == 'series':
-        if len(styles)==1:
-            for j in arange(len(places)):
-                placeCurrent = np.convolve(Covid(places[j]).getSeries(thisSeries,minCases=sinceCases), np.ones((smoothingDays,))/smoothingDays, mode='valid')
+        for j in arange(len(places)):
+            placeCurrent = np.convolve(Covid(places[j]).getSeries(thisSeries,minCases=sinceCases), np.ones((smoothingDays,))/smoothingDays, mode='valid')
+            if len(styles)==1:
                 plot(placeCurrent,styles)
-        else:
-            for j in arange(len(places)):
-                placeCurrent = np.convolve(Covid(places[j]).getSeries(thisSeries,minCases=sinceCases), np.ones((smoothingDays,))/smoothingDays, mode='valid')
+            else:
                 plot(placeCurrent,styles[j])
     if order == 'rates':
-        if len(styles)==1:
-            for j in arange(len(places)):
-                placeCurrent = np.convolve(Covid(places[j]).getLogD(thisSeries,minCases=sinceCases,frac=True), np.ones((smoothingDays,))/smoothingDays, mode='valid')
+        for j in arange(len(places)):
+            placeCurrent = np.convolve(Covid(places[j]).getLogD(thisSeries,minCases=sinceCases,frac=True), np.ones((smoothingDays,))/smoothingDays, mode='valid')
+            if len(styles)==1:
                 plot(placeCurrent,styles)
-        else:
-            for j in arange(len(places)):
-                placeCurrent = np.convolve(Covid(places[j]).getLogD(thisSeries,minCases=sinceCases,frac=True), np.ones((smoothingDays,))/smoothingDays, mode='valid')
+            else:
                 plot(placeCurrent,styles[j])
     if order == 'curve':
-        print('curve')
-        if len(styles)==1:
-            for j in arange(len(places)):
-                placeCurrent = np.convolve(Covid(places[j]).getSeries(thisSeries,minCases=sinceCases), np.ones((smoothingDays,))/smoothingDays, mode='valid')
-                curve = np.convolve(placeCurrent[1:]-placeCurrent[0:-1], np.ones((smoothingDays,))/smoothingDays, mode='valid')
+        for j in arange(len(places)):
+            placeCurrent = np.convolve(Covid(places[j]).getSeries(thisSeries,minCases=sinceCases), np.ones((smoothingDays,))/smoothingDays, mode='valid')
+            curve = np.convolve(placeCurrent[1:]-placeCurrent[0:-1], np.ones((smoothingDays,))/smoothingDays, mode='valid')
+            if len(styles)==1:
                 plot(curve,styles)
-        else:
-            for j in arange(len(places)):
-                placeCurrent = np.convolve(Covid(places[j]).getSeries(thisSeries,minCases=sinceCases), np.ones((smoothingDays,))/smoothingDays, mode='valid')
-                curve = np.convolve(placeCurrent[1:]-placeCurrent[0:-1], np.ones((smoothingDays,))/smoothingDays, mode='valid')
-                plot(curve,styles[j])                
+            else:
+                plot(curve,styles[j])
+    if order == 'deathrate':
+        for j in arange(len(places)):
+            placeConfirmed = np.convolve(Covid(places[j]).getSeries('confirmed',minCases=sinceCases), np.ones((smoothingDays,))/smoothingDays, mode='valid')
+            confirmedN     = len(placeConfirmed)
+            placeDeaths = np.convolve(Covid(places[j]).getSeries('deaths',minCases=0), np.ones((smoothingDays,))/smoothingDays, mode='valid')
+            placeDeaths = placeDeaths[-confirmedN:]
+            if len(styles)==1:
+                plot(placeConfirmed,placeDeaths,styles)
+            else:
+                plot(placeConfirmed,placeDeaths,styles[j])
+        x = arange(1000,500000)
+        ylo = .001*x
+        y1  = .01*x
+        y5  = .05*x
+        y10 = .1*x
+        plot(x,ylo,'k-.')
+        plot(x,y1,'k-.')
+        plot(x,y5,'k-.')
+        plot(x,y10,'k-.')
