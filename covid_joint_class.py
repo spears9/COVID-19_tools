@@ -239,3 +239,8 @@ def plotGlobal(figNum,places,thisSeries,order,sinceCases=100,smoothingDays=4,sty
         plot(x,y1,'k-.')
         plot(x,y5,'k-.')
         plot(x,y10,'k-.')
+
+
+def smooth(x,n):
+    smoothed = np.convolve(x, np.ones((n,))/n, mode='valid')
+    return smoothed
